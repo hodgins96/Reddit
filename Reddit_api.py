@@ -1,38 +1,63 @@
 import requests
 import json
-
+#func get_token
+b_url = 'https://www.reddit.com/'
 data = {'grant_type': 'password', 'username': 'vaxxine_search', 'password': 'Passcode1'}
 auth = requests.auth.HTTPBasicAuth('tnR6JRMF8AnS-g','BDZJvrtYl4QyWt2DoaawfztVJUM')
-r = requests.post('https://www.reddit.com/' + 'api/v1/access_token',
+r = requests.post(b_url + 'api/v1/access_token',
                   data=data,
                   headers={'user-agent': 'subreddit_search by vaxxine_search'},
 		          auth=auth)
 d = r.json()
 
 token = d['access_token']
-
+ 
+#func call api / dissect api 
+db_url = 'https://oauth.reddit.com/r/' #url called once token is recieved
+option = '/search' #for future so can be easily changed
+subreddit = 'hockey'
+search_term = 'salad'
 headers = {'Authorization': 'bearer ' + token, 'User-Agent': 'subreddit_search by vaxxine_search'}
-search = {'q':'Meteor', 'limit': 100, 'show':'All','restrict_sr': True} #restric_sr restricts to that subreddit
-req = requests.get('https://oauth.reddit.com/r/niagarafallsontario/search/', headers=headers, params=search)
+search = {'q':search_term, 'limit': 25,'restrict_sr': True} #restric_sr restricts to that subreddit
+req = requests.get(db_url + subreddit + option, headers=headers, params=search)
 
 results = req.json()
 
-siblingPosts = results['data']['children']
-print(json.dumps(results, indent=4, sort_keys=True))
+siblingPosts = results['data']['children'] #how many posts are found
+#print(json.dumps(results, indent=4, sort_keys=True))
 # results = results['data']['children'][0]['data']
 # title = results['title']
-# print(json.dumps(results, indent=4, sort_keys=True))
+print(json.dumps(results, indent=4, sort_keys=True))
 title = []
 link = []
+selfText = []
 #keys = siblingPosts[0]['data'].keys()
 #print(keys)
 # print(title)
 pos = 0
 for x in siblingPosts: # for loop for searching through multiple posts
-    title.append(siblingPosts[pos]['data']['title'])
-    link.append(siblingPosts[pos]['data']['permalink'])
-    print(title[pos] + " Link " + "reddit.com" + link[pos])
-    pos += 1
+    #print(siblingPosts[pos]['data']['title'])
+    #print(siblingPosts[pos]['data']['permalink'])
+    #print(siblingPosts[pos]['data']['selftext'])
+    if search_term.casefold() in siblingPosts[pos]['data']['title'].casefold(): #casefold to check for work matching not case
+
+        title.append(siblingPosts[pos]['data']['title'])
+        link.append(siblingPosts[pos]['data']['permalink'])
+        if(siblingPosts[pos]['data']['selftext'])=="":
+            selfText.append('No Self Text')
+        else:
+            selfText.append(siblingPosts[pos]['data']['selftext'])
+            
+            
+        #print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    pos+=1  
+count = 0
+for ele in title:
+    print('Post :) ' + str(count + 1) +" "+ ele + link[count]  + "\n")
+    count +=1
+#func send email 
+
+
 
 
 # TO DO 
