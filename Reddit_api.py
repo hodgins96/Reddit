@@ -57,6 +57,24 @@ for ele in title:
     count +=1
 #func send email 
 
+to = 'reddit.searchbot@gmail.com'
+sender = 'redditsearchbot@gmail.com'
+pwd = 'Passcode1'
+msg = ("From: {0}\r\nTo: {1}\r\n\r\nSubject: Search Results for {2} in /r/{3}\r\n".format(sender,to,search_term,subreddit))
+msg = msg + title[0]
+print (msg)
+try:
+    server = smtplib.SMTP('smtp.gmail.com', 25)
+    server.connect('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    server.login(sender,pwd)
+    server.sendmail(sender,to,msg)
+    server.quit()
+except Exception as e:
+    print(e)
+
+
 
 
 
