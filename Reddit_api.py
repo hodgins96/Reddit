@@ -1,5 +1,7 @@
 import requests
 import json
+from email.message import EmailMessage
+import smtplib
 #func get_token
 b_url = 'https://www.reddit.com/'
 data = {'grant_type': 'password', 'username': 'vaxxine_search', 'password': 'Passcode1'}
@@ -15,10 +17,10 @@ token = d['access_token']
 #func call api / dissect api 
 db_url = 'https://oauth.reddit.com/r/' #url called once token is recieved
 option = '/search' #for future so can be easily changed
-subreddit = 'hockey'
-search_term = 'salad'
+subreddit = 'aww'
+search_term = 'Doggos'
 headers = {'Authorization': 'bearer ' + token, 'User-Agent': 'subreddit_search by vaxxine_search'}
-search = {'q':search_term, 'limit': 25,'restrict_sr': True} #restric_sr restricts to that subreddit
+search = {'q':search_term, 'limit': 100,'restrict_sr': True} #restric_sr restricts to that subreddit
 req = requests.get(db_url + subreddit + option, headers=headers, params=search)
 
 results = req.json()
@@ -44,35 +46,41 @@ for x in siblingPosts: # for loop for searching through multiple posts
         title.append(siblingPosts[pos]['data']['title'])
         link.append(siblingPosts[pos]['data']['permalink'])
         if(siblingPosts[pos]['data']['selftext'])=="":
-            selfText.append('No Self Text')
+            selfText.append('False')
         else:
-            selfText.append(siblingPosts[pos]['data']['selftext'])
-            
+            #selfText.append(siblingPosts[pos]['data']['selftext'])
+            selfText.append('True')
             
         #print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     pos+=1  
 count = 0
+content = 'Results returned from search \n\n'
+htmlContent = '<html> \n <h1>Results returned from search </h1> \n <body> \n <p> \n '
 for ele in title:
-    print('Post :) ' + str(count + 1) +" "+ ele + link[count]  + "\n")
+    content = content + ('Post:' + str(count + 1) +" "+ ele +"\nLink: "+b_url +link[count]  + "\n" + "Post Text: " + selfText[count] + "\n\n")
+    htmlContent = htmlContent + ('Post:' + str(count + 1) +' '+ ele +'\nLink: '+b_url + link[count]  + '\n' + 'Post Text: ' + selfText[count] + '\n\n')
     count +=1
 #func send email 
-
-to = 'reddit.searchbot@gmail.com'
+htmlContent = htmlContent + "</p> \n </body> \n </html>"
+to = 'redditsearch.bot@gmail.com'
 sender = 'redditsearchbot@gmail.com'
 pwd = 'Passcode1'
-msg = ("From: {0}\r\nTo: {1}\r\n\r\nSubject: Search Results for {2} in /r/{3}\r\n".format(sender,to,search_term,subreddit))
-msg = msg + title[0]
-print (msg)
+print(htmlContent)
+
+msg = EmailMessage()
+msg['Subject'] = f'Search Results for {search_term} in /r/{subreddit}' #fstring for ease
+msg['From'] = sender
+msg['To'] = to
+
+msg.set_content(content) #Make email content message above in for loop
+
 try:
-    server = smtplib.SMTP('smtp.gmail.com', 25)
-    server.connect('smtp.gmail.com', 587)
-    server.ehlo()
-    server.starttls()
+    server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
     server.login(sender,pwd)
-    server.sendmail(sender,to,msg)
+    server.send_message(msg)
     server.quit()
-except Exception as e:
-    print(e)
+except:
+    print("Your Princess is in another castle")
 
 
 
