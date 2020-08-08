@@ -1,5 +1,9 @@
 import requests
 import json
+import smtplib 
+#import ssl
+#from email.message import EmailMessage
+
 #func get_token
 b_url = 'https://www.reddit.com/'
 data = {'grant_type': 'password', 'username': 'vaxxine_search', 'password': 'Passcode1'}
@@ -16,7 +20,7 @@ token = d['access_token']
 db_url = 'https://oauth.reddit.com/r/' #url called once token is recieved
 option = '/search' #for future so can be easily changed
 subreddit = 'hockey'
-search_term = 'salad'
+search_term = 'Toronto'
 headers = {'Authorization': 'bearer ' + token, 'User-Agent': 'subreddit_search by vaxxine_search'}
 search = {'q':search_term, 'limit': 25,'restrict_sr': True} #restric_sr restricts to that subreddit
 req = requests.get(db_url + subreddit + option, headers=headers, params=search)
@@ -56,13 +60,28 @@ for ele in title:
     print('Post :) ' + str(count + 1) +" "+ ele + link[count]  + "\n")
     count +=1
 #func send email 
-
+to = 'reddit.searchbot@gmail.com'
+sender = 'redditsearchbot@gmail.com'
+pwd = 'Passcode1'
+msg = ("From: {0}\r\nTo: {1}\r\n\r\nSubject: Search Results for {2} in /r/{3}\r\n".format(sender,to,search_term,subreddit))
+msg = msg + title[0]
+print (msg)
+try:
+    server = smtplib.SMTP('smtp.gmail.com', 25)
+    server.connect('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    server.login(sender,pwd)
+    server.sendmail(sender,to,msg)
+    server.quit()
+except Exception as e:
+    print(e)
 
 
 
 # TO DO 
 # Comment code
-# Figure out why results from other subreddits show up 
+# 
 # Email returned information 
 # Allow for custom inputs of subreddits and search terms
 
