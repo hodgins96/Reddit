@@ -2,10 +2,16 @@ import requests
 import json
 from email.message import EmailMessage
 import smtplib
+import os #environment variables
 #func get_token
 b_url = 'https://www.reddit.com/'
-data = {'grant_type': 'password', 'username': 'vaxxine_search', 'password': 'Passcode1'}
-auth = requests.auth.HTTPBasicAuth('tnR6JRMF8AnS-g','BDZJvrtYl4QyWt2DoaawfztVJUM')
+reddit_name = os.environ.get('REDDIT_NAME')
+reddit_pass = os.environ.get('REDDIT_PASS')
+reddit_public = os.environ.get('REDDIT_PUBLIC')
+reddit_private = os.environ.get('REDDIT_PRIVATE')
+#environment _variables next two lines
+data = {'grant_type': 'password', 'username': reddit_name, 'password': reddit_pass}
+auth = requests.auth.HTTPBasicAuth(reddit_public,reddit_private)
 r = requests.post(b_url + 'api/v1/access_token',
                   data=data,
                   headers={'user-agent': 'subreddit_search by vaxxine_search'},
@@ -63,10 +69,11 @@ for ele in title:
 #func send email 
 htmlContent = htmlContent + "</p> \n </body> \n </html>"
 to = 'redditsearch.bot@gmail.com'
-sender = 'redditsearchbot@gmail.com'
-pwd = 'Passcode1'
+#environment Variable
+sender = os.environ.get('EMAIL_ACC')
+#Environment variable
+pwd = os.environ.get('EMAIL_PASS')
 print(htmlContent)
-
 msg = EmailMessage()
 msg['Subject'] = f'Search Results for {search_term} in /r/{subreddit}' #fstring for ease
 msg['From'] = sender
@@ -79,8 +86,9 @@ try:
     server.login(sender,pwd)
     server.send_message(msg)
     server.quit()
-except:
+except Exception as e:
     print("Your Princess is in another castle")
+    print(e)
 
 
 
