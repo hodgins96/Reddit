@@ -1,7 +1,7 @@
 # Reddit
 subreddit search
 
-Small python script to search a subreddit for posts with a keyword or phrase inside the title.
+Small python script to search a subreddit for posts with a keyword or phrase inside the title filters all returned results if keyword/phrase doesnt exist in it.
 
 Uses environment variables for all keys usernames and passwords, flags to allow the user to dictate which subreddit they want to search, what to search, and how many reuslts they want.
 
