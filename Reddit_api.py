@@ -35,7 +35,7 @@ def send_email(filtered_results,subreddit,search_term): #send emails
         count +=1
 
     htmlContent = htmlContent + '</p> \n </body> \n </html>'
-    to = 'redditsearch.bot@gmail.com' #change to careers@vaxxine.com
+    to = 'careers@vaxxine.com'
     #environment Variable
     sender = os.environ.get('EMAIL_ACC')
     #Environment variable
@@ -64,7 +64,7 @@ def api_call_filter(token,subreddit,search_term,limit):
     if subreddit == None: #if not argument passed manually set
         subreddit = 'Hockey'
     if search_term == None:
-        search_term = 'New York Rangers'
+        search_term = 'Salad'
     if limit == None: #same check as above
         limit = 100
     headers = {'Authorization': 'bearer ' + token, 'User-Agent': 'subreddit_search by vaxxine_search'}
